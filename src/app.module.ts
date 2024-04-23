@@ -6,10 +6,13 @@ import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { OffersModule } from './offers/offers.module';
+import { HashModule } from './hash/hash.module';
+import { AuthModule } from './auth/auth.module';
+import config from './config/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ load: [config], isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -19,6 +22,8 @@ import { OffersModule } from './offers/offers.module';
     WishesModule,
     WishlistsModule,
     OffersModule,
+    HashModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

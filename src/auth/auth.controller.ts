@@ -18,7 +18,7 @@ export class AuthController {
     return this.authService.signin(userId);
   }
 
-  @Post('signUp')
+  @Post('signup')
   @UseFilters(InvalidExepctionFilter)
   signUp(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
