@@ -15,8 +15,8 @@ import { UpdateWishDto } from './dto/update-wish.dto';
 export class WishesService {
   constructor(
     @InjectRepository(Wish)
-    private wishRepository: Repository<Wish>,
-    private dataSource: DataSource,
+    private readonly wishRepository: Repository<Wish>,
+    private readonly dataSource: DataSource,
   ) {}
   create(createWishDto: CreateWishDto, user: User) {
     return this.wishRepository.save({ ...createWishDto, owner: user });

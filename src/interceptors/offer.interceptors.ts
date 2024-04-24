@@ -5,34 +5,23 @@ import {
   CallHandler,
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
+import { Wish } from 'src/wishes/entities/wish.entity';
 
 @Injectable()
-export class PasswordWishInterceptor implements NestInterceptor {
+export class OfferInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next.handle().pipe(
-      map((data) => {
-        if (Array.isArray(data)) {
-          return data.map((user) => {
-            const {
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              owner: { password, ...ownerWithoutPassword },
-              ...rest
-            } = user;
-            return { ...rest, owner: ownerWithoutPassword };
-          });
-        } else {
-          data?.offers?.map((offer) => {
-            delete offer.user.password;
-            return offer;
-          });
-          const {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            owner: { password, ...ownerWithoutPassword },
-            ...rest
-          } = data;
-          return { ...rest, owner: ownerWithoutPassword };
+    return next.handle().pipe(map((data) => this.hideOfferAmount(data)));
+  }
+  private hideOfferAmount(wish: Wish): Wish {
+    {
+      if (wish instanceof Object && wish.offers) {
+        for (const offer of wish.offers) {
+          if (offer.hidden) {
+            delete offer.amount;
+          }
         }
-      }),
-    );
+      }
+      return wish;
+    }
   }
 }

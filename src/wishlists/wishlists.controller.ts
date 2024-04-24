@@ -47,6 +47,6 @@ export class WishlistsController {
 
   @Delete(':id')
   remove(@Param('id') wishId: number, @AuthUserId() userId: number) {
-    return this.wishlistsService.delete(wishId, userId);
+    return this.wishlistsService.remove(wishId, userId);
   }
 }

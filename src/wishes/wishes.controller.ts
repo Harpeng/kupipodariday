@@ -17,8 +17,8 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthUser, AuthUserId } from 'src/decorators/user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { PasswordUserInterceptor } from 'src/interceptors/password-user.interceptors';
-import { PasswordWishInterceptor } from 'src/interceptors/offer.interceptors';
 import { InvalidExepctionFilter } from 'src/filters/invalid-data-excepction.filters';
+import { OfferInterceptor } from 'src/interceptors/offer.interceptors';
 
 @Controller('wishes')
 export class WishesController {
@@ -42,7 +42,7 @@ export class WishesController {
     return this.wishesService.findTop();
   }
 
-  @UseInterceptors(PasswordUserInterceptor, PasswordWishInterceptor)
+  @UseInterceptors(PasswordUserInterceptor, OfferInterceptor)
   @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {

@@ -7,9 +7,8 @@ import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wishlist } from './entities/wishlist.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { WishesService } from 'src/wishes/wishes.service';
-import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
@@ -18,8 +17,6 @@ export class WishlistsService {
     @InjectRepository(Wishlist)
     private wishListRepository: Repository<Wishlist>,
     private readonly wishesService: WishesService,
-    private readonly usersService: UsersService,
-    private readonly dataSource: DataSource,
   ) {}
   async create(createWishlistDto: CreateWishlistDto, user: User) {
     const { itemsId, ...rest } = createWishlistDto;
@@ -33,16 +30,12 @@ export class WishlistsService {
     return wishlist;
   }
 
-  async findAll() {
-    const wishlists = await this.wishListRepository.find({
-      relations: ['owner', 'items'],
-    });
-
-    if (!wishlists) {
-      throw new NotFoundException('WishList not found');
-    }
-
-    return wishlists;
+  findAll() {
+    return (
+      this.wishListRepository.find({
+        relations: ['owner', 'items'],
+      }) || []
+    );
   }
 
   async findById(id: number) {
@@ -56,14 +49,20 @@ export class WishlistsService {
     return wishlist;
   }
 
-  async delete(userId: number, wishListId: number) {
-    const wishlist = await this.findById(wishListId);
+  async remove(userId: number, wishListId: number) {
+    const wishlist = await this.wishListRepository.findOne({
+      where: { id: wishListId },
+      relations: ['owner'],
+    });
 
-    if (userId !== wishlist.owner.id) {
+    if (!wishlist) {
+      throw new NotFoundException('Wishlist not found');
+    }
+    if (wishlist.owner.id !== userId) {
       throw new BadRequestException('You are not the owner of the wishlist');
     }
-
-    return await this.wishListRepository.delete(wishListId);
+    await this.wishListRepository.delete(wishListId);
+    return wishlist;
   }
 
   async update(

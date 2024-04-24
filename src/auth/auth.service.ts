@@ -13,17 +13,10 @@ export class AuthService {
   async validatePassword(username: string, password: string) {
     const user = await this.usersService.findOne(username);
 
-    if (!user) {
-      throw new UnauthorizedException('Username or password is invalid');
-    }
-
-    const isValid = await this.hashService.isMatch(password, user.password);
-    if (!isValid) {
-      throw new UnauthorizedException('Username or password is invalid');
+    if (user && (await this.hashService.isMatch(password, user.password))) {
+      return user;
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+      throw new UnauthorizedException('Username or password is invalid');
     }
   }
   async signin(userId: number) {

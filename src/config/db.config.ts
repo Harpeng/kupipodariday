@@ -1,19 +1,12 @@
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Wish } from 'src/wishes/entities/wish.entity';
-import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
-import { Offer } from 'src/offers/entities/offer.entity';
+import { TypeOrmOptionsFactory } from '@nestjs/typeorm';
 
-export default (configService: ConfigService): TypeOrmModuleOptions => {
-  return {
-    type: 'postgres',
-    host: configService.get('DB_HOST'),
-    port: configService.get('DB_PORT'),
-    username: configService.get('DB_USER'),
-    password: configService.get('DB_PASSWORD'),
-    database: configService.get('DB_NAMEBASE'),
-    entities: [User, Wish, Wishlist, Offer],
-    synchronize: configService.get('DB_SYNCHRONIZE'),
-  };
-};
+@Injectable()
+export class DatabaseConfigFactory implements TypeOrmOptionsFactory {
+  constructor(private configService: ConfigService) {}
+
+  createTypeOrmOptions() {
+    return this.configService.get('database');
+  }
+}
